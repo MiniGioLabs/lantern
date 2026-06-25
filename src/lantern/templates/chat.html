@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Lantern 🏮</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{brand:'#f59e0b','brand-dark':'#d97706'}}}}</script>
+    <style>.msg-in{animation:fadeIn .2s ease-out}@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}</style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
+    <header class="bg-gray-900/80 backdrop-blur border-b border-gray-800 px-4 py-3 flex items-center justify-between">
+        <span class="text-lg font-bold text-brand">🏮 Lantern</span>
+        <form id="model-form" class="inline">
+            <select name="model" id="model-sel"
+                    class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-gray-300 outline-none">
+                {% for m in models %}
+                <option value="{{ m.name }}" {% if loop.first %}selected{% endif %}>{{ m.name[:20] }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </header>
+
+    <main id="chat" class="flex-1 overflow-y-auto px-4 py-4 space-y-3" style="padding-bottom:100px">
+        <div class="text-center py-10">
+            <div class="text-5xl mb-3">🏮</div>
+            <h1 class="text-xl font-bold mb-1">Your AI Lantern</h1>
+            <p class="text-gray-500 text-sm">Chat with local LLMs from your phone. Nothing leaves this room.</p>
+            {% if qr_code %}
+            <div class="mt-4 inline-block bg-white p-3 rounded-xl">
+                <img src="data:image/png;base64,{{ qr_code }}" alt="QR" class="w-32 h-32">
+                <p class="text-gray-800 text-xs mt-1 text-center">http://{{ lan_ip }}:8000</p>
+            </div>
+            <p class="text-xs text-gray-600 mt-2">📱 Scan to connect your phone</p>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur border-t border-gray-800 px-4 py-3">
+        <form id="chat-form" class="flex gap-2"
+              hx-post="/api/generate" hx-target="#chat" hx-swap="beforeend"
+              hx-on::after-request="this.reset();scrollChat()">
+            <input type="hidden" name="model" id="model-input" value="{{ models[0].name if models else 'llama3.1' }}">
+            <input type="text" name="prompt" placeholder="Ask anything..." required autofocus autocomplete="off"
+                   class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand transition">
+            <button type="submit" class="bg-brand text-gray-900 px-5 py-3 rounded-xl text-sm font-bold hover:bg-brand-dark transition shrink-0">Send</button>
+        </form>
+    </footer>
+
+    <script>
+    document.getElementById('model-sel').addEventListener('change',function(){document.getElementById('model-input').value=this.value});
+    document.getElementById('model-input').value=document.getElementById('model-sel').value;
+    function scrollChat(){var c=document.getElementById('chat');c.scrollTop=c.scrollHeight}
+    </script>
+</body>
+</html>

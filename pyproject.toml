@@ -1,0 +1,15 @@
+[project]
+name = "lantern"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "aiosqlite>=0.22.1",
+    "fastapi>=0.138.0",
+    "httpx>=0.28.1",
+    "jinja2>=3.1.6",
+    "pydantic>=2.13.4",
+    "python-multipart>=0.0.32",
+    "qrcode>=8.2",
+    "uvicorn>=0.49.0",
+]
